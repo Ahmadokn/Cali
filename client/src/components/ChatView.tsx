@@ -9,6 +9,7 @@ export default function ChatView() {
     { role: 'assistant', content: 'How can i help you today?' }
   ]);
   const [input, setInput] = useState('');
+  const [loading, setLoading] = useState<boolean>(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const sendMessage = async () => {
@@ -20,6 +21,7 @@ export default function ChatView() {
     setMessages(newMessages);
     setInput('');
 
+    setLoading(true);
     try {
       const response = await axios.post(
         `${api}/chat`,
@@ -28,8 +30,10 @@ export default function ChatView() {
       );
       const aiMessage = response.data.message;
       setMessages(prev => [...prev, aiMessage]);
+      setLoading(false);
     } catch (err) {
       console.error('Chat error:', err);
+      setLoading(false);
     }
   };
 
@@ -54,6 +58,22 @@ export default function ChatView() {
           </div>
         ))}
         <div ref={scrollRef} />
+        {loading && (
+          <div className="flex justify-center py-2 space-x-2">
+            <div
+              className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"
+              style={{ animationDelay: '0ms' }}
+            />
+            <div
+              className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"
+              style={{ animationDelay: '150ms' }}
+            />
+            <div
+              className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"
+              style={{ animationDelay: '300ms' }}
+            />
+          </div>
+        )}
       </div>
       <div className="flex">
         <input

@@ -23,12 +23,14 @@ const getAssignment = async (req, res) => {
 
 // Create new assignment
 const createAssignment = async (req, res) => {
-  const { title, course, dueDate, priority } = req.body;
+  const { title, course, dueDate, dueTime, description, priority, status, tags, reminder, recurrence } = req.body;
   let emptyFields = [];
   if (!title) emptyFields.push("title");
   if (!course) emptyFields.push("course");
   if (!dueDate) emptyFields.push("dueDate");
+  if (!dueTime) emptyFields.push("dueTime");
   if (!priority) emptyFields.push("priority");
+  if (!status) emptyFields.push("status");
   if (emptyFields.length > 0) {
     return res
       .status(400)
@@ -40,12 +42,20 @@ const createAssignment = async (req, res) => {
       title,
       course,
       dueDate,
+      dueTime,
+      description,
       priority,
+      status,
+      tags,
+      reminder,
+      recurrence,
       user_id
     });
-    res.status(200).json(assignment);
+    // Indicate successful insertion
+    res.status(200).json({ inserted: true, assignment });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    // Indicate insertion failure
+    res.status(400).json({ inserted: false, error: err.message });
   }
 };
 

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import AssignmentDetails from "../components/AssignmentDetails";
 import AssignmentForm from "../components/AssignmentForm";
@@ -10,6 +10,7 @@ import { api } from "../constants";
 
 const Home = () => {
   const { assignmentsState, dispatch } = useAssignmentsContext();
+  const [showItems, setShowItems] = useState<boolean>(false);
   const { userState } = useUserContext();
 
   useEffect(() => {
@@ -36,14 +37,24 @@ const Home = () => {
       <div className="col-span-2 pl-6">
         <CalendarView />
       </div>
-      <div>
-        <AssignmentForm />
-        <div className="mt-8">
-          {assignmentsState.assignments &&
-            assignmentsState.assignments.map((assignment) => (
-              <AssignmentDetails key={uuidv4()} assignment={assignment} />
-            ))}
+      <div className="pr-10">
+      <button
+        onClick={() => setShowItems(prev => !prev)}
+        className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+      >
+        {showItems ? "Hide Items" : "Show Items"}
+      </button>
+      <AssignmentForm />
+      {showItems && (
+        <div className="mt-4 bg-slate-100 rounded">
+          {assignmentsState.assignments.map((assignment) => (
+            <AssignmentDetails
+              key={uuidv4()}
+              assignment={assignment}
+            />
+          ))}
         </div>
+      )}
       </div>
     </div>
   );

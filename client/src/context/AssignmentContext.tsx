@@ -5,7 +5,19 @@ export type Assignment = {
   title: String;
   course: String;
   dueDate: Date;
+  dueTime: string;
+  description: string;
   priority: 'none' | 'low' | 'medium' | 'high';
+  status: 'pending' | 'in-progress' | 'completed';
+  tags: string[];
+  reminder: {
+    enabled: boolean;
+    offsetMinutes: number;
+  };
+  recurrence: {
+    frequency: 'none' | 'daily' | 'weekly' | 'monthly';
+    interval: number;
+  };
   createdAt: Date;
   updatedAt: Date;
   __v: number;
