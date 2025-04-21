@@ -7,8 +7,11 @@ const BREAK_MINUTES = 5;
 export default function PomodoroTimer() {
   // “mode” is either 'work' or 'break'
   const [mode, setMode] = useState<'work'|'break'>('work');
+  // User-defined durations
+  const [workMinutesState, setWorkMinutesState] = useState<number>(WORK_MINUTES);
+  const [breakMinutesState, setBreakMinutesState] = useState<number>(BREAK_MINUTES);
   // seconds remaining
-  const [secondsLeft, setSecondsLeft] = useState(WORK_MINUTES * 60);
+  const [secondsLeft, setSecondsLeft] = useState(workMinutesState * 60);
   const [isRunning, setIsRunning] = useState(false);
   const timerRef = useRef<number>();
   
@@ -31,7 +34,7 @@ export default function PomodoroTimer() {
   useEffect(() => {
     if (secondsLeft < 0) {
       const nextMode = mode === 'work' ? 'break' : 'work';
-      const nextSeconds = (nextMode === 'work' ? WORK_MINUTES : BREAK_MINUTES) * 60;
+      const nextSeconds = (nextMode === 'work' ? workMinutesState : breakMinutesState) * 60;
       setMode(nextMode);
       setSecondsLeft(nextSeconds);
       // optional: fire a browser notification or play a sound
@@ -53,7 +56,7 @@ export default function PomodoroTimer() {
   const reset = () => {
     setIsRunning(false);
     setMode('work');
-    setSecondsLeft(WORK_MINUTES * 60);
+    setSecondsLeft(workMinutesState * 60);
   };
 
   // Format MM:SS
@@ -62,6 +65,28 @@ export default function PomodoroTimer() {
 
   return (
     <div className="p-8 max-w-sm mx-auto text-center bg-white rounded shadow">
+      <div className="mb-4 flex space-x-4 justify-center">
+        <label className="flex items-center space-x-2">
+          <span>Work (min):</span>
+          <input
+            type="number"
+            min="1"
+            className="w-16 p-1 border rounded"
+            value={workMinutesState}
+            onChange={e => setWorkMinutesState(Number(e.target.value))}
+          />
+        </label>
+        <label className="flex items-center space-x-2">
+          <span>Break (min):</span>
+          <input
+            type="number"
+            min="1"
+            className="w-16 p-1 border rounded"
+            value={breakMinutesState}
+            onChange={e => setBreakMinutesState(Number(e.target.value))}
+          />
+        </label>
+      </div>
       <h2 className="text-xl mb-4">{mode === 'work' ? 'Work' : 'Break'}</h2>
       <div className="text-5xl font-mono mb-4">{minutes}:{seconds}</div>
       <div className="space-x-4">
