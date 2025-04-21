@@ -46,14 +46,14 @@ export default function PomodoroTimer() {
         nextMode === 'work' ? 'Time to focus!' : 'Take a break!'
       );
     }
-  }, [secondsLeft, mode]);
+  }, [secondsLeft, mode, workMinutesState, breakMinutesState]);
 
   // Reset timer when user changes durations
   useEffect(() => {
     setIsRunning(false);
     // Update remaining seconds based on current mode
     setSecondsLeft((mode === 'work' ? workMinutesState : breakMinutesState) * 60);
-  }, [workMinutesState, breakMinutesState]);
+  }, [workMinutesState, breakMinutesState, mode]);
 
   // Helpers
   const start = () => {
