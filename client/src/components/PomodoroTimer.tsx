@@ -16,7 +16,11 @@ export default function PomodoroTimer() {
   const timerRef = useRef<number>();
   
   // Lofi YouTube audio (replace VIDEO_ID with your chosen track)
-  const ytUrl = 'https://www.youtube.com/watch?v=sF80I-TQiW0&ab_channel=TheJapaneseTown';
+  const defaultVideoUrl = 'https://www.youtube.com/watch?v=sF80I-TQiW0&ab_channel=TheJapaneseTown';
+  const [videoUrl, setVideoUrl] = useState<string>(defaultVideoUrl);
+  const [showCustomInput, setShowCustomInput] = useState<boolean>(false);
+  const [customUrlInput, setCustomUrlInput] = useState<string>(videoUrl);
+  const [showVideo, setShowVideo] = useState<boolean>(false);
 
   // Tick every second when running
   useEffect(() => {
@@ -44,6 +48,13 @@ export default function PomodoroTimer() {
     }
   }, [secondsLeft, mode]);
 
+  // Reset timer when user changes durations
+  useEffect(() => {
+    setIsRunning(false);
+    // Update remaining seconds based on current mode
+    setSecondsLeft((mode === 'work' ? workMinutesState : breakMinutesState) * 60);
+  }, [workMinutesState, breakMinutesState]);
+
   // Helpers
   const start = () => {
     setIsRunning(true);
@@ -65,6 +76,43 @@ export default function PomodoroTimer() {
 
   return (
     <div className="p-8 max-w-sm mx-auto text-center bg-white rounded shadow">
+      <div className="mb-4">
+        <button
+          onClick={() => {
+            setShowCustomInput(!showCustomInput);
+            setCustomUrlInput(videoUrl);
+          }}
+          className="mt-2 text-sm text-blue-500"
+        >
+          Change Song
+        </button>
+        {showCustomInput && (
+          <div className="mt-2 flex items-center space-x-2">
+            <input
+              type="text"
+              className="flex-1 p-2 border rounded"
+              placeholder="Paste YouTube link here"
+              value={customUrlInput}
+              onChange={e => setCustomUrlInput(e.target.value)}
+            />
+            <button
+              onClick={() => {
+                setVideoUrl(customUrlInput);
+                setShowCustomInput(false);
+              }}
+              className="px-3 py-1 bg-green-500 text-white rounded"
+            >
+              Save
+            </button>
+            <button
+              onClick={() => setShowCustomInput(false)}
+              className="px-3 py-1 bg-gray-300 text-black rounded"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+      </div>
       <div className="mb-4 flex space-x-4 justify-center">
         <label className="flex items-center space-x-2">
           <span>Work (min):</span>
@@ -88,7 +136,17 @@ export default function PomodoroTimer() {
         </label>
       </div>
       <h2 className="text-xl mb-4">{mode === 'work' ? 'Work' : 'Break'}</h2>
-      <div className="text-5xl font-mono mb-4">{minutes}:{seconds}</div>
+      <div
+        className={`text-5xl font-mono mb-4 ${isRunning ? 'animate-pulse' : ''}`}
+      >
+        {minutes}:{seconds}
+      </div>
+      <button
+        onClick={() => setShowVideo(prev => !prev)}
+        className="mb-4 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+      >
+        {showVideo ? 'Hide Video' : 'Show Video'}
+      </button>
       <div className="space-x-4">
         {!isRunning 
           ? <button onClick={start} className="px-4 py-2 bg-green-500 text-white rounded">Start</button>
@@ -96,9 +154,21 @@ export default function PomodoroTimer() {
         }
         <button onClick={reset} className="px-4 py-2 bg-red-500 text-white rounded">Reset</button>
       </div>
+      {showVideo && (
+        <div className="mt-4">
+          <ReactPlayer
+            url={videoUrl}
+            playing={isRunning}
+            loop
+            controls
+            width="100%"
+            height="360px"
+          />
+        </div>
+      )}
       {/* Hidden YouTube audio player */}
       <ReactPlayer
-        url={ytUrl}
+        url={videoUrl}
         playing={isRunning}
         loop
         muted={false}
@@ -112,7 +182,6 @@ export default function PomodoroTimer() {
               controls: 0,
               disablekb: 1,
               showinfo: 0,
-              autoplay: 1,
               playlist: 'sF80I-TQiW0'
             }
           }
